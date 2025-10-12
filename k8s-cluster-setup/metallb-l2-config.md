@@ -22,8 +22,12 @@ kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.15.2/confi
 
 ## 3. Verify the `metallb-system` namespace and pods
 
+```bash
 kubectl get pods -n metallb-system
+```
+```bash
 kubectl get deployments -n metallb-system
+```
 
 ## 4. Basic L2 (Layer-2) configuration
 
