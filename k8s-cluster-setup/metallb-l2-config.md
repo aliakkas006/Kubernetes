@@ -75,15 +75,61 @@ kubectl apply -f metallb-l2-adv.yaml
 ## 6. Test with a LoadBalancer service
 
 ```bash
-kubectl create deployment nginx --image=nginx
+sudo vim nginx-deployment.yaml
+```
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.27.2
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+  labels:
+    app: nginx
+spec:
+  type: LoadBalancer
+  selector:
+    app: nginx
+  ports:
+    - name: http
+      port: 80          # Port exposed by the service
+      targetPort: 80    # Port on the container
 ```
 
 ```bash
-kubectl expose deployment nginx --port=80 --target-port=80 --type=LoadBalancer --name=nginx-lb
+kubectl apply -f nginx-deployment.yaml
 ```
 
 ```bash
-kubectl get svc nginx-lb
+kubectl get svc nginx-service
 ```
 
 - EXTERNAL-IP should show an IP from our pool (e.g. 192.168.56.240)
